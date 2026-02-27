@@ -1,0 +1,60 @@
+# ==============================================================================
+# 🛑 اخطار آموزشی بسیار مهم (WARNING) 🛑
+# دانشجوی گرامی، شما تحت هیچ شرایطی مجاز به ویرایش یا تغییر این فایل نیستید!
+# در پایان ددلاین، تاریخچه‌ی کامیت‌های (Commits) مخزن شما به صورت خودکار بررسی می‌شود.
+# در صورت مشاهده‌ی کوچکترین تغییر (Commit) روی این فایل، این عمل به عنوان تقلب 
+# و دستکاری در سیستم داوری تلقی شده و نمره کل این تمرین برای شما صفر (0) لحاظ خواهد شد.
+# ==============================================================================
+
+name: Assembly Autograder
+
+on: [push]
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout student code
+        uses: actions/checkout@v3
+
+      - name: Install NASM
+        run: sudo apt-get update && sudo apt-get install nasm -y
+
+      - name: Checkout hidden tests
+        uses: actions/checkout@v3
+        with:
+          # 👨‍🏫 TA Guide: For future assignments, only update the hidden repository name below (e.g., hw2-tests)
+          repository: Assembly-Course-Fall2026/hw1-addition-Hemo
+          token: ${{ secrets.TA_TOKEN }}
+          path: hidden-tests
+
+      - name: Compile All Practices
+        run: |
+          # ====================================================================
+          # 👨‍🏫 TA Guide for Managing Practices:
+          # To add or remove practices for an assignment, simply edit the lines below.
+          #
+          # Standard compilation format:
+          # nasm -f elf64 [student_file].asm -o [temp_name].o && ld [temp_name].o -o [executable_name] || true
+          #
+          # ⚠️ CRITICAL NOTE: The `|| true` at the end of each line is MANDATORY! 
+          # This ensures that if a student hasn't submitted a specific practice yet, 
+          # the server won't crash and will continue grading the remaining practices.
+          # ====================================================================
+          
+          echo "🛠️ Compiling student codes..."
+          
+          # Practice 1
+          nasm -f elf64 practice 1.asm -o p1.o && ld p1.o -o practice1 || true
+          
+          # Practice 2
+          nasm -f elf64 practice2.asm -o p2.o && ld p2.o -o practice2 || true
+          
+          # Practice 3
+          nasm -f elf64 practice3.asm -o p3.o && ld p3.o -o practice3 || true
+          
+          # To add Practice 4, simply uncomment the line below:
+          # nasm -f elf64 practice4.asm -o p4.o && ld p4.o -o practice4 || true
+
+      - name: Run Autograder
+        run: python3 hidden-tests/grader.py
